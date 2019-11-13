@@ -73,7 +73,7 @@ async def play_file(ctx, filename):
         return
 #maximum doot
 
-    await ctx.send(":thumbsup: played the effect!")
+    #await ctx.send(":thumbsup: played the effect!")
     while voice_channel.is_playing():
         await asyncio.sleep(1)
 
