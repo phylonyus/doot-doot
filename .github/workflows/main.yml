@@ -1,0 +1,37 @@
+on: 
+  push:
+    branches: 
+      - master
+name: Publish DootDoot Bot to Prod
+jobs:
+  FTP-Deploy:
+    name: FTP-Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@2.0.0
+      env:
+        FTP_SERVER: ${{ secrets.DH_PROD_FTP_HOST }}
+        FTP_USERNAME: ${{ secrets.DH_PROD_FTP_USERNAME }}
+        FTP_PASSWORD: ${{ secrets.DH_PROD_FTP_PW }}
+        REMOTE_DIR: /home/robbiechatbot/doot-doot/
+        ARGS: --delete
+        # --delete arg will delete files on the server if you've deleted them in git
+  Restart-App:
+    name: Restart-App
+    needs: FTP-Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DH_PROD_FTP_HOST }}
+        username: ${{ secrets.DH_PROD_FTP_USERNAME }}
+        password: ${{ secrets.DH_PROD_FTP_PW }}
+        port: 22
+        script_stop: true
+        script: |
+            /home/robbiechatbot/doot-doot/DootRestart.sh
+            echo "DootDoot successfully re-dooted!"
+    
