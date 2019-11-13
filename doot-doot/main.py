@@ -10,7 +10,6 @@ from discord.ext.commands import Bot
 
 from utils import Logger
 
-
 def getConfig(path):
     configFile = open(path, "r")
     return json.loads(configFile.read())
@@ -62,7 +61,7 @@ async def on_guild_join(guild):
     embed.set_thumbnail(url="https://cdn.onlinewebfonts.com/svg/img_145486.png")
 
     await channel.send(embed=embed)
-    Logger.logDebug("Bot was added to a new server!", "INFO")
+    Logger.logDebug("Bot was added to a new server mannnn!", "INFO")
 
 
 @client.event
