@@ -109,7 +109,7 @@ class Airhorn(commands.Cog):
         filename = random.choice(os.listdir("sounds/fart"))
         await play_file(ctx, "sounds/fart/" + filename)
 
-    @commands.command(aliases=['planes'])
+    @commands.command(aliases=['planes','airplane','boeing','airbus'])
     @commands.guild_only()
     async def aviation(self, ctx):
         """Aviation."""
