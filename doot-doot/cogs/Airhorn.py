@@ -39,7 +39,7 @@ async def play_file(ctx, filename):
 
     # There is a 1 in 100th chance that it
     # will do a rickroll instead of the desired sound
-    random_chance = random.randint(1, 100)
+    random_chance = random.randint(1, 500)
     if random_chance == 1:
         source = discord.FFmpegPCMAudio("sounds/rickroll.mp3")
     else:
