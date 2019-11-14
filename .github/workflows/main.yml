@@ -6,7 +6,6 @@ name: Publish DootDoot Bot to Prod
 jobs:
   Restart-App:
     name: Restart-App
-    needs: FTP-Deploy
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
