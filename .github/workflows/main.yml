@@ -15,7 +15,7 @@ jobs:
         FTP_SERVER: ${{ secrets.DH_PROD_FTP_HOST }}
         FTP_USERNAME: ${{ secrets.DH_PROD_FTP_USERNAME }}
         FTP_PASSWORD: ${{ secrets.DH_PROD_FTP_PW }}
-        REMOTE_DIR: /home/robbiechatbot/doot-doot/
+        REMOTE_DIR: ~/doot-doot/
         ARGS: --delete
         # --delete arg will delete files on the server if you've deleted them in git
   Restart-App:
