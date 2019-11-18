@@ -162,6 +162,8 @@ class Airhorn(commands.Cog):
         else:
             group = ''
         save_path = os.path.join(sounds_path, group, filename)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
         downloaded_file = requests.get(url)
         open(save_path, 'wb').write(downloaded_file.content)
         await ctx.send(f'added {filename}, restarting')
