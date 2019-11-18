@@ -139,6 +139,12 @@ class Airhorn(commands.Cog):
         await ctx.send(str(aliases))
         # await ctx.send(str(alias_dict)[:2000])
 
+    @commands.command()
+    @commands.guild_only()
+    async def restart(self, ctx):
+        os.system('. /home/robbiechatbot/doot-doot/DootRestart.sh')
+        await ctx.send('ok, tried to restart myself')
+
     #TODO handle these aliases we still want
     # @commands.command(aliases=['planes','airplane','boeing','airbus'])
     # @commands.guild_only()
