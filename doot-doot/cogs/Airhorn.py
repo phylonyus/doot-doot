@@ -5,6 +5,12 @@ import os
 import re
 from discord.ext import commands
 
+def getConfig(path):
+    configFile = open(path, "r")
+    return json.loads(configFile.read())
+
+
+config = getConfig("config.json")
 
 # defining function to handle playing sounds in Voice Channel
 async def play_file(ctx, filename):
@@ -71,7 +77,6 @@ async def play_file(ctx, filename):
         await voice_channel.disconnect()
         print(f'Error trying to play a sound: {e}')
         return
-#maximum doot
 
     #await ctx.send(":thumbsup: played the effect!")
     while voice_channel.is_playing():
@@ -81,19 +86,48 @@ async def play_file(ctx, filename):
 
     await voice_channel.disconnect()
 
-def getListOfAliases():
-	f = []
-	dirs = os.listdir("sounds/")
-	for file in dirs:
-		f.append(file[:file.rfind('.')])
-	return f
+def getAliasDict():
+	alias_dict = {}
+	with os.scandir(sounds_path) as it:
+		for entry in it:
+			cmd = str(entry.name)
+			path = entry.path
+			if entry.is_file():
+				cmd = cmd.split('.')[0]
+				# print(cmd + " " + path)
+				alias_dict[cmd] = path
+			if entry.is_dir():
+				alias_dict[cmd] = []
+				with os.scandir(entry.path) as it2:
+					for sub_entry in it2:
+						sub_cmd = str(sub_entry.name)
+						sub_path = sub_entry.path
+						# print(sub_cmd + " " + sub_path)
+						full_cmd = cmd + sub_cmd_sep + sub_cmd
+						alias_dict[full_cmd] = sub_path
+						alias_dict[cmd].append(sub_path)
+	return alias_dict
 
-file_formats = [".mp3",".wav"]
 
 # Beginning of commands
 class Airhorn(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    alias_dict = getAliasDict()
+    aliases = list(alias_dict.keys())
+
+    @commands.command(aliases=aliases)
+    @commands.guild_only():
+    async def master_command(self, ctx):
+        """Handles all commands in a sketchy custom way"""
+        command = ctx.message.content[config['prefix']:]
+        alias_entry = alias_dict[command]
+        if isinstance(alias_entry], list):
+            file_path = alias_dict[random.choice(alias_entry)]
+        else:
+            file_path = alias_entry
+        await play_file(ctx, file_path)
 
     @commands.command()
     @commands.guild_only()
