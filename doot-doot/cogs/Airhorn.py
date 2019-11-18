@@ -17,6 +17,8 @@ config = getConfig("config.json")
 sounds_path = config['sounds_path']
 sub_cmd_sep = config['sub_cmd_sep']
 
+voice_channel = None
+
 # defining function to handle playing sounds in Voice Channel
 async def play_file(ctx, filename):
     if not ctx.author.voice:
@@ -148,6 +150,13 @@ class Airhorn(commands.Cog):
     async def restart(self, ctx):
         restart_bot()
         await ctx.send('ok, tried to restart myself')
+
+    @commands.command()
+    @commands.guild_only()
+    async def stop(self, ctx):
+        if voice_channel != None and voice_channel.is_playing():
+            voice_channel.stop()
+            await voice_channel.disconnect()
 
     @commands.command()
     @commands.guild_only()
