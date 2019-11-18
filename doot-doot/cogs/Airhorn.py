@@ -113,6 +113,9 @@ def getAliasDict():
 						alias_dict[cmd].append(sub_path)
 	return alias_dict
 
+def restart_bot():
+    os.system('. /home/robbiechatbot/doot-doot/DootRestart.sh')
+
 alias_dict = getAliasDict()
 aliases = list(alias_dict.keys())
 
@@ -143,7 +146,7 @@ class Airhorn(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def restart(self, ctx):
-        os.system('. /home/robbiechatbot/doot-doot/DootRestart.sh')
+        restart_bot()
         await ctx.send('ok, tried to restart myself')
 
     @commands.command()
@@ -161,8 +164,8 @@ class Airhorn(commands.Cog):
         save_path = os.path.join(sounds_path, group, filename)
         downloaded_file = requests.get(url)
         open(save_path, 'wb').write(downloaded_file.content)
-        await ctx.send(f'added {filename}')
-        self.restart()
+        await ctx.send(f'added {filename}, restarting')
+        restart_bot()
 
     #TODO handle these aliases we still want
     # @commands.command(aliases=['planes','airplane','boeing','airbus'])
