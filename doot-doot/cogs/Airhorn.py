@@ -4,6 +4,7 @@ import asyncio
 import os
 import re
 import json
+import requests
 from discord.ext import commands
 
 def getConfig(path):
@@ -144,6 +145,24 @@ class Airhorn(commands.Cog):
     async def restart(self, ctx):
         os.system('. /home/robbiechatbot/doot-doot/DootRestart.sh')
         await ctx.send('ok, tried to restart myself')
+
+    @commands.command()
+    @commands.guild_only()
+    async def add(self, ctx):
+        '''use like: 'add wow  to add file to wow group, otherwise adds file as base sound'''
+        command = ctx.message.content.split(config['prefix'])[1]
+        attachment = ctx.message.attachments[0]
+        url = attachment.url
+        filename = attachment.filename
+        if len(command.split(sub_cmd_sep)) == 2:
+            group = command.split(sub_cmd_sep)[1]
+        else:
+            group = ''
+        save_path = os.path.join(sounds_path, group, filename)
+        downloaded_file = requests.get(url)
+        open(save_path, 'wb').write(downloaded_file.content)
+        await ctx.send(f'added {filename}')
+        self.restart()
 
     #TODO handle these aliases we still want
     # @commands.command(aliases=['planes','airplane','boeing','airbus'])
