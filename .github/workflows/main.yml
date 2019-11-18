@@ -19,4 +19,3 @@ jobs:
         script: |
             /home/robbiechatbot/doot-doot/DootRestart.sh
             echo "DootDoot successfully re-dooted!"
-    

@@ -3,6 +3,7 @@ import random
 import asyncio
 import os
 import re
+import json
 from discord.ext import commands
 
 def getConfig(path):
@@ -11,6 +12,9 @@ def getConfig(path):
 
 
 config = getConfig("config.json")
+
+sounds_path = "sounds"
+sub_cmd_sep = ":"
 
 # defining function to handle playing sounds in Voice Channel
 async def play_file(ctx, filename):
@@ -100,266 +104,274 @@ def getAliasDict():
 				alias_dict[cmd] = []
 				with os.scandir(entry.path) as it2:
 					for sub_entry in it2:
-						sub_cmd = str(sub_entry.name)
+						sub_cmd = str(sub_entry.name.split('.')[0])
 						sub_path = sub_entry.path
-						# print(sub_cmd + " " + sub_path)
 						full_cmd = cmd + sub_cmd_sep + sub_cmd
+						# print(full_cmd + " " + sub_path)
 						alias_dict[full_cmd] = sub_path
 						alias_dict[cmd].append(sub_path)
 	return alias_dict
 
+alias_dict = getAliasDict()
+aliases = list(alias_dict.keys())
 
 # Beginning of commands
 class Airhorn(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    alias_dict = getAliasDict()
-    aliases = list(alias_dict.keys())
-
     @commands.command(aliases=aliases)
-    @commands.guild_only():
+    @commands.guild_only()
     async def master_command(self, ctx):
         """Handles all commands in a sketchy custom way"""
-        command = ctx.message.content[config['prefix']:]
+        command = ctx.message.content.split(config['prefix'])[1]
         alias_entry = alias_dict[command]
-        if isinstance(alias_entry], list):
-            file_path = alias_dict[random.choice(alias_entry)]
+        if isinstance(alias_entry, list):
+            file_path = random.choice(alias_entry)
         else:
             file_path = alias_entry
+        await ctx.send(alias_entry)
+        await ctx.send(file_path)
         await play_file(ctx, file_path)
 
     @commands.command()
     @commands.guild_only()
-    async def wow(self, ctx):
-        """Says wow."""
-        filename = random.choice(os.listdir("sounds/wow"))
-        await play_file(ctx, "sounds/wow/" + filename)
+    async def check_aliases(self, ctx):
+        await ctx.send("current aliases:")
+        await ctx.send(str(aliases))
+        await ctx.send(str(alias_dict)[:2000])
 
-    @commands.command()
-    @commands.guild_only()
-    async def fart(self, ctx):
-        """Farts."""
-        filename = random.choice(os.listdir("sounds/fart"))
-        await play_file(ctx, "sounds/fart/" + filename)
+    # @commands.command()
+    # @commands.guild_only()
+    # async def wow(self, ctx):
+    #     """Says wow."""
+    #     filename = random.choice(os.listdir("sounds/wow"))
+    #     await play_file(ctx, "sounds/wow/" + filename)
 
-    @commands.command(aliases=['planes','airplane','boeing','airbus'])
-    @commands.guild_only()
-    async def aviation(self, ctx):
-        """Aviation Related Sounds"""
-        filename = random.choice(os.listdir("sounds/aviation"))
-        await play_file(ctx, "sounds/aviation/" + filename)
+    # @commands.command()
+    # @commands.guild_only()
+    # async def fart(self, ctx):
+    #     """Farts."""
+    #     filename = random.choice(os.listdir("sounds/fart"))
+    #     await play_file(ctx, "sounds/fart/" + filename)
 
-    @commands.command(aliases=['420','bong','bongrip'])
-    @commands.guild_only()
-    async def weed(self, ctx):
-        """Bong Rips"""
-        filename = random.choice(os.listdir("sounds/420"))
-        await play_file(ctx, "sounds/420/" + filename)
+    # @commands.command(aliases=['planes','airplane','boeing','airbus'])
+    # @commands.guild_only()
+    # async def aviation(self, ctx):
+    #     """Aviation Related Sounds"""
+    #     filename = random.choice(os.listdir("sounds/aviation"))
+    #     await play_file(ctx, "sounds/aviation/" + filename)
 
-    @commands.command()
-    @commands.guild_only()
-    async def doot(self, ctx):
-        """Doots the horn."""
-        await play_file(ctx, "sounds/airhorn.mp3")
+    # @commands.command(aliases=['420','bong','bongrip'])
+    # @commands.guild_only()
+    # async def weed(self, ctx):
+    #     """Bong Rips"""
+    #     filename = random.choice(os.listdir("sounds/420"))
+    #     await play_file(ctx, "sounds/420/" + filename)
 
-    @commands.command()
-    @commands.guild_only()
-    async def bazinga(self, ctx):
-        """BAZINGA!"""
-        await play_file(ctx, "sounds/bazinga.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def doot(self, ctx):
+    #     """Doots the horn."""
+    #     await play_file(ctx, "sounds/airhorn.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def justdoit(self, ctx):
-        """Tells you to just do it."""
-        await play_file(ctx, "sounds/justdoit.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def bazinga(self, ctx):
+    #     """BAZINGA!"""
+    #     await play_file(ctx, "sounds/bazinga.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def clap(self, ctx):
-        """..you did good. Here are some claps."""
-        await play_file(ctx, "sounds/clap.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def justdoit(self, ctx):
+    #     """Tells you to just do it."""
+    #     await play_file(ctx, "sounds/justdoit.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def oof(self, ctx):
-        """Roblox oof."""
-        await play_file(ctx, "sounds/oof.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def clap(self, ctx):
+    #     """..you did good. Here are some claps."""
+    #     await play_file(ctx, "sounds/clap.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def nope(self, ctx):
-        """Nope."""
-        await play_file(ctx, "sounds/nope.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def oof(self, ctx):
+    #     """Roblox oof."""
+    #     await play_file(ctx, "sounds/oof.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def suspense(self, ctx):
-        """Sudden suspense."""
-        await play_file(ctx, "sounds/suddensus.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def nope(self, ctx):
+    #     """Nope."""
+    #     await play_file(ctx, "sounds/nope.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def sad(self, ctx):
-        """The saddest music you've ever heard."""
-        await play_file(ctx, "sounds/sadmusic.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def suspense(self, ctx):
+    #     """Sudden suspense."""
+    #     await play_file(ctx, "sounds/suddensus.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def fail(self, ctx):
-        """Wow.. you failed pretty bad tbh."""
-        await play_file(ctx, "sounds/fail.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def sad(self, ctx):
+    #     """The saddest music you've ever heard."""
+    #     await play_file(ctx, "sounds/sadmusic.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def gay(self, ctx):
-        """HA Gay sound effect"""
-        await play_file(ctx, "sounds/hagay.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def fail(self, ctx):
+    #     """Wow.. you failed pretty bad tbh."""
+    #     await play_file(ctx, "sounds/fail.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def no(self, ctx):
-        """No."""
-        await play_file(ctx, "sounds/no.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def gay(self, ctx):
+    #     """HA Gay sound effect"""
+    #     await play_file(ctx, "sounds/hagay.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def godno(self, ctx):
-        """No.. GOD. NO."""
-        await play_file(ctx, "sounds/godno.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def no(self, ctx):
+    #     """No."""
+    #     await play_file(ctx, "sounds/no.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def dootstorm(self, ctx):
-        """What song is this? Ah, it's Darude - Dootstorm."""
-        await play_file(ctx, "sounds/dootstorm.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def godno(self, ctx):
+    #     """No.. GOD. NO."""
+    #     await play_file(ctx, "sounds/godno.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def WTF(self, ctx):
-        """Bitch... what the fuck?"""
-        await play_file(ctx, "sounds/WTF.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def dootstorm(self, ctx):
+    #     """What song is this? Ah, it's Darude - Dootstorm."""
+    #     await play_file(ctx, "sounds/dootstorm.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def fuckedup(self, ctx):
-        """it was at this moment he knew.. he fucked up."""
-        await play_file(ctx, "sounds/fuckedup.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def WTF(self, ctx):
+    #     """Bitch... what the fuck?"""
+    #     await play_file(ctx, "sounds/WTF.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def ohno(self, ctx):
-        """oh no no no."""
-        await play_file(ctx, "sounds/ohno.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def fuckedup(self, ctx):
+    #     """it was at this moment he knew.. he fucked up."""
+    #     await play_file(ctx, "sounds/fuckedup.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def ohhh(self, ctx):
-        """ohhhhhhh."""
-        await play_file(ctx, "sounds/ohhh.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def ohno(self, ctx):
+    #     """oh no no no."""
+    #     await play_file(ctx, "sounds/ohno.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def thuglife(self, ctx):
-        """So you think you are living the thug life?"""
-        await play_file(ctx, "sounds/thuglife.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def ohhh(self, ctx):
+    #     """ohhhhhhh."""
+    #     await play_file(ctx, "sounds/ohhh.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def horn(self, ctx):
-        """DJ horn."""
-        await play_file(ctx, "sounds/djhorn.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def thuglife(self, ctx):
+    #     """So you think you are living the thug life?"""
+    #     await play_file(ctx, "sounds/thuglife.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def phintro(self, ctx):
-        """Sound Effect from intro of popular xxx website (no actuall 18+ content present)"""
-        await play_file(ctx, "sounds/phintro.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def horn(self, ctx):
+    #     """DJ horn."""
+    #     await play_file(ctx, "sounds/djhorn.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def memereview(self, ctx):
-        """👏meme👏review"""
-        await play_file(ctx, "sounds/meme-review.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def phintro(self, ctx):
+    #     """Sound Effect from intro of popular xxx website (no actuall 18+ content present)"""
+    #     await play_file(ctx, "sounds/phintro.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def spongebob(self, ctx):
-        """this IS whole intro song from Spongebob, play at your discretion"""
-        await play_file(ctx, "sounds/spongebob.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def memereview(self, ctx):
+    #     """👏meme👏review"""
+    #     await play_file(ctx, "sounds/meme-review.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def mariocoin(self, ctx):
-        """Ding!"""
-        await play_file(ctx, "sounds/mario_coin.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def spongebob(self, ctx):
+    #     """this IS whole intro song from Spongebob, play at your discretion"""
+    #     await play_file(ctx, "sounds/spongebob.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def honk(self, ctx):
-        """Honk Honk!"""
-        await play_file(ctx, "sounds/honk.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def mariocoin(self, ctx):
+    #     """Ding!"""
+    #     await play_file(ctx, "sounds/mario_coin.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def gottem(self, ctx):
-        """Ha! Got eem"""
-        await play_file(ctx, "sounds/ha-got-eeem.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def honk(self, ctx):
+    #     """Honk Honk!"""
+    #     await play_file(ctx, "sounds/honk.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def wololo(self, ctx):
-        """Wololo"""
-        await play_file(ctx, "sounds/wololo.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def gottem(self, ctx):
+    #     """Ha! Got eem"""
+    #     await play_file(ctx, "sounds/ha-got-eeem.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def yee(self, ctx):
-        """yee"""
-        await play_file(ctx, "sounds/yee.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def wololo(self, ctx):
+    #     """Wololo"""
+    #     await play_file(ctx, "sounds/wololo.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def birdup(self, ctx):
-        """birdup"""
-        await play_file(ctx, "sounds/bird-up-short.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def yee(self, ctx):
+    #     """yee"""
+    #     await play_file(ctx, "sounds/yee.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def birdupmedium(self, ctx):
-        """birdup, medium length"""
-        await play_file(ctx, "sounds/bird-up-medium.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def birdup(self, ctx):
+    #     """birdup"""
+    #     await play_file(ctx, "sounds/bird-up-short.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def birduplong(self, ctx):
-        """birdup, long length"""
-        await play_file(ctx, "sounds/bird-up-long.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def birdupmedium(self, ctx):
+    #     """birdup, medium length"""
+    #     await play_file(ctx, "sounds/bird-up-medium.mp3")
 
-    @commands.command(name='#teamwork')
-    @commands.guild_only()
-    async def hashtag_teamwork(self, ctx):
-        """#teamwork"""
-        await play_file(ctx, "sounds/hashtag-teamwork.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def birduplong(self, ctx):
+    #     """birdup, long length"""
+    #     await play_file(ctx, "sounds/bird-up-long.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def teamwork(self, ctx):
-        """teamwork"""
-        await play_file(ctx, "sounds/teamwork.mp3")
+    # @commands.command(name='#teamwork')
+    # @commands.guild_only()
+    # async def hashtag_teamwork(self, ctx):
+    #     """#teamwork"""
+    #     await play_file(ctx, "sounds/hashtag-teamwork.mp3")
 
-    @commands.command()
-    @commands.guild_only()
-    async def nice(self, ctx):
-        """nice"""
-        await play_file(ctx, "sounds/nice.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def teamwork(self, ctx):
+    #     """teamwork"""
+    #     await play_file(ctx, "sounds/teamwork.mp3")
+
+    # @commands.command()
+    # @commands.guild_only()
+    # async def nice(self, ctx):
+    #     """nice"""
+    #     await play_file(ctx, "sounds/nice.mp3")
 	
-    @commands.command()
-    @commands.guild_only()
-    async def verynice(self, ctx):
-        """verynice"""
-        await play_file(ctx, "sounds/verynice.mp3")
+    # @commands.command()
+    # @commands.guild_only()
+    # async def verynice(self, ctx):
+    #     """verynice"""
+    #     await play_file(ctx, "sounds/verynice.mp3")
 
 def setup(bot):
     bot.add_cog(Airhorn(bot))
