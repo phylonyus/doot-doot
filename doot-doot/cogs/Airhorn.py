@@ -13,8 +13,8 @@ def getConfig(path):
 
 config = getConfig("config.json")
 
-sounds_path = "sounds"
-sub_cmd_sep = ":"
+sounds_path = config['sounds']
+sub_cmd_sep = config['sub_cmd_sep']
 
 # defining function to handle playing sounds in Voice Channel
 async def play_file(ctx, filename):
