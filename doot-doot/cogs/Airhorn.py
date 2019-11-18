@@ -13,7 +13,7 @@ def getConfig(path):
 
 config = getConfig("config.json")
 
-sounds_path = config['sounds']
+sounds_path = config['sounds_path']
 sub_cmd_sep = config['sub_cmd_sep']
 
 # defining function to handle playing sounds in Voice Channel
