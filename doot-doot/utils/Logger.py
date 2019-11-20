@@ -37,7 +37,6 @@ def setup_logger():
 
 async def log(message, bot, level="INFO", debug=""):
     pass
-    # lmao turn off logging
     # Return if the logging level is not DEBUG, and the bot is trying to log some debugging stuff
     logger = logging.getLogger("doot-doot")
     if (logger.getEffectiveLevel != logging.DEBUG) and (level == "DEBUG"):
@@ -82,7 +81,6 @@ def logDebug(message, level="INFO"):
 
 async def logCommand(commandName, ctx, level="INFO"):
     pass
-    # lol, turn off logging
     if isinstance(ctx.message.channel, discord.DMChannel):
         await log(ctx.author.name + "#" + ctx.author.discriminator + " just ran the " + commandName + " command",
                   ctx.bot, level)
