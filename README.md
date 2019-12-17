@@ -23,15 +23,13 @@ This fork is in honor of Owen Wilson, with added wow factor.
   
   
 ## Adding new sound effects
-Replace command_syntax and file_name respectively with: command used to play sound and filename of sound
-### Syntax
-```py
-    @commands.command()
-    @commands.guild_only()
-    async def command_syntax(self, ctx):
-        """command_description"""
-        await play_file(ctx, "sounds/file_name.mp3")
-```
+  1. Add the bot to your server
+  2. Drag a mp3 or wav file onto Discord (`wow1.mp3` will become the command `'wow1`)
+  3. In the upload dialog, add  `'add`
+  4. (Optional) Add the sound effect to category (`'add wow` will make the command `wow wow1`)
+  
+  note: calling a category will play a random sound from that category
+
 ## Attributions
 
 Bot and support server images were created by Freepik from www.flaticon.com and are under Creative Commons BY 3.0 licence
