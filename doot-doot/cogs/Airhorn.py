@@ -93,32 +93,34 @@ async def play_file(ctx, filename):
 
     await voice_channel.disconnect()
 
-def getAliasDict():
-	alias_dict = {}
-	with os.scandir(sounds_path) as it:
-		for entry in it:
-			cmd = str(entry.name)
-			path = entry.path
-			if entry.is_file():
-				cmd = cmd.split('.')[0]
-				# print(cmd + " " + path)
-				alias_dict[cmd] = path
-			if entry.is_dir():
-				alias_dict[cmd] = []
-				with os.scandir(entry.path) as it2:
-					for sub_entry in it2:
-						sub_cmd = str(sub_entry.name.split('.')[0])
-						sub_path = sub_entry.path
-						full_cmd = cmd + sub_cmd_sep + sub_cmd
-						# print(full_cmd + " " + sub_path)
-						alias_dict[full_cmd] = sub_path
-						alias_dict[cmd].append(sub_path)
-	return alias_dict
+def getAliasInfo():
+    alias_dict = {}
+    category_list = []
+    with os.scandir(sounds_path) as it:
+        for entry in it:
+            cmd = str(entry.name)
+            path = entry.path
+            if entry.is_file():
+                cmd = cmd.split('.')[0]
+                # print(cmd + " " + path)
+                alias_dict[cmd] = path
+            if entry.is_dir():
+                alias_dict[cmd] = []
+                category_list.append(cmd)
+                with os.scandir(entry.path) as it2:
+                    for sub_entry in it2:
+                        sub_cmd = str(sub_entry.name.split('.')[0])
+                        sub_path = sub_entry.path
+                        full_cmd = cmd + sub_cmd_sep + sub_cmd
+                        # print(full_cmd + " " + sub_path)
+                        alias_dict[full_cmd] = sub_path
+                        alias_dict[cmd].append(sub_path)
+    return alias_dict, category_list
 
 def restart_bot():
     os.system('. /home/robbiechatbot/doot-doot/DootRestart.sh')
 
-alias_dict = getAliasDict()
+alias_dict, category_list = getAliasInfo()
 aliases = list(alias_dict.keys())
 
 # Beginning of commands
@@ -142,8 +144,22 @@ class Airhorn(commands.Cog):
     @commands.guild_only()
     async def check_aliases(self, ctx):
         await ctx.send("current aliases:")
-        await ctx.send(str(aliases))
-        # await ctx.send(str(alias_dict)[:2000])
+        msg_limit = 2000
+        aliases_str = str(aliases)
+        for i in range(0, len(aliases_str), msg_limit):
+            message = aliases_str[i:i+msg_limit]
+            await ctx.send(message)
+
+    @commands.command()
+    @commands.guild_only()
+    async def check_cats(self, ctx):
+        await ctx.send("current categories:")
+        msg_limit = 2000
+        cats_str = str(category_list)
+        for i in range(0, len(cats_str), msg_limit):
+            message = cats_str[i:i+msg_limit]
+            await ctx.send(message)
+    
 
     @commands.command()
     @commands.guild_only()
@@ -161,7 +177,7 @@ class Airhorn(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def add(self, ctx):
-        '''use like: 'add wow  to add file to wow group, otherwise adds file as base sound'''
+        '''command will be filename w/o file extension. You can add to group like: 'add wow'''
         command = ctx.message.content.split(config['prefix'])[1]
         attachment = ctx.message.attachments[0]
         url = attachment.url
