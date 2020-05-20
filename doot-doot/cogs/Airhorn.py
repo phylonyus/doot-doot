@@ -5,6 +5,8 @@ import os
 import re
 import json
 import requests
+from pathlib import Path
+
 from discord.ext import commands
 
 def getConfig(path):
