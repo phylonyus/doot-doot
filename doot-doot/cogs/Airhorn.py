@@ -242,6 +242,7 @@ class Airhorn(commands.Cog):
         size = 0
         message = []
         msg = "```"
+        await ctx.send("Before paths loop")
         for path in paths:
             message.append(path.displayable())
         #print(len(message))
