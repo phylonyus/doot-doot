@@ -2,6 +2,8 @@ import discord
 import random
 import asyncio
 import os
+import sys
+import subprocess
 import re
 import json
 import requests
@@ -20,6 +22,15 @@ sounds_path = config['sounds_path']
 sub_cmd_sep = config['sub_cmd_sep']
 
 voice_channel = None
+
+def isLoud(savepath):
+    cmd = 'ffmpeg -i'+ savepath + ' -filter:a volumedetect -f null /dev/null 2>&1 | grep -oP \'mean_volume: \\K.([0-9]?\\d+(\\.\\d+))\''
+    out = subprocess.getoutput(cmd)
+    num = float(out.split()[0])
+    if num >= -6.0:
+        return True
+    else:
+        return False
 
 ############################################################### Define class for pretty printing
 class DisplayablePath(object):
@@ -304,8 +315,16 @@ class Airhorn(commands.Cog):
             os.makedirs(save_dir)
         downloaded_file = requests.get(url)
         open(save_path, 'wb').write(downloaded_file.content)
-        await ctx.send(f'added {filename}, restarting')
-        restart_bot()
+        if isLoud(save_path):
+            os.remove(save_path)
+            await ctx.send("""
+```
+ERROR: Funny because loud. Sound too loud, please choose a different file
+```
+""")
+        else:
+            await ctx.send(f'added {filename}, restarting')
+            restart_bot()
 
     #TODO handle these aliases we still want
     # @commands.command(aliases=['planes','airplane','boeing','airbus'])
