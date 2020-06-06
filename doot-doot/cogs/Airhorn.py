@@ -288,8 +288,8 @@ class Airhorn(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def restart(self, ctx):
+        await ctx.send('Attemping to restart')
         restart_bot()
-        await ctx.send('ok, tried to restart myself')
 
     @commands.command()
     @commands.guild_only()
