@@ -319,7 +319,7 @@ class Airhorn(commands.Cog):
             os.remove(save_path)
             await ctx.send("""
 ```
-ERROR: Funny because loud. Sound too loud, please choose a different file
+ERROR: fUnNy bEcAuSe LoUd. Sound too loud, please choose a different file
 ```
 """)
         else:
