@@ -47,7 +47,7 @@ class DisplayablePath(object):
             self.depth = self.parent.depth + 1
         else:
             self.depth = 0
-
+ 
     @property
     def displayname(self):
         if self.path.is_dir():
